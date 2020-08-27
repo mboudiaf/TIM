@@ -44,9 +44,9 @@ source env/bin/activate
 ```
 Then to visualize the results, turn on your local visdom server:
 ```python
-python -m visdom.server -port 8098
+python -m visdom.server -port 8097
 ```
-and open it in your browser : http://localhost:8098/ . Then, for instance, if you want to train a Resnet-18 on mini-Imagenet, go to the root of the directory, and execute:
+and open it in your browser : http://localhost:8097/ . Then, for instance, if you want to train a Resnet-18 on mini-Imagenet, go to the root of the directory, and execute:
 ```python
 bash scripts/train/resnet18.sh
 ```
@@ -61,12 +61,12 @@ source env/bin/activate
 ### 3.1 Benchmarks (Table 1. in paper)
 
 
-|(1 shot/5 shot)|     Arch    | mini-Imagenet | Tiered-Imagenet | CUB  |
-| 	   ---      |      ---    |      ---      |	   ---          |  --- |
+|(1 shot/5 shot)|     Arch    | mini-Imagenet | Tiered-Imagenet |
+| 	   ---      |      ---    |      ---      |	   ---          |
 | TIM-ADM       |   Resnet-18 | 73.6 / **85.0**  | **80.0** / **88.5** |
 | TIM-GD        |   Resnet-18 |  **73.9** / **85.0**  | 79.9 / **88.5**  |
-| TIM-ADM       |   WRN28-10  |  77.5 / 87.2  | 82.0 / 89.7     | |
-| TIM-GD        |   WRN28-10  |  **77.8** / **87.4**  | **82.1** / **89.8**   |
+| TIM-ADM       |   WRN28-10  |  77.5 / 87.2  | 82.0 / 89.7     |
+| TIM-GD        |   WRN28-10  |  **77.8** / **87.4**  | **82.1** / **89.8** |
 
 To reproduce the results from Table 1. in the paper, use the bash files at scripts/evaluate/. For instance, if you want to reproduce the methods on mini-Imagenet, go to the root of the directory and execute:
 ```python
@@ -115,7 +115,7 @@ for respectively TIM-ADM, TIM-GD {W} and TIM-GD {phi, W}.
 
 
 
-<img src="plots/mini.png" width="500" height="400"/>
+<img src="plots/mini.png" width="800" height="400"/>
 
 ## Contact
 
