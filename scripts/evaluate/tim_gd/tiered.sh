@@ -10,7 +10,7 @@ python3 -m src.main \
 		model.num_classes=351 \
 		evaluate=True \
 		tim.iter=1000 \
-		eval_parallel.method='tim_gd' \
+		eval.method='tim_gd' \
 
 # ===========================> WRN 28-10 <=========================================
 
@@ -23,7 +23,7 @@ python3 -m src.main \
 		model.num_classes=351 \
 		tim.iter=1000 \
 		evaluate=True \
-		eval_parallel.method='tim_gd' \
+		eval.method='tim_gd' \
 
 # ===========================> DenseNet <=========================================
 
@@ -37,5 +37,5 @@ python3 -m src.main \
 		model.num_classes=351 \
 		tim.iter=1000 \
 		evaluate=True \
-		eval_parallel.method='tim_gd' \
+		eval.method='tim_gd' \
 

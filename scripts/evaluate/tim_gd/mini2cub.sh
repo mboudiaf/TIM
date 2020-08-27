@@ -9,6 +9,6 @@ python3 -m src.main \
 		model.arch='resnet18' \
 		tim.iter=1000 \
 		evaluate=True \
-		eval_parallel.method='tim_gd' \
-		eval_parallel.target_data_path="data/cub/CUB_200_2011/images" \
-		eval_parallel.target_split_dir="split/cub"
+		eval.method='tim_gd' \
+		eval.target_data_path="data/cub/CUB_200_2011/images" \
+		eval.target_split_dir="split/cub"

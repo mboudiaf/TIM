@@ -8,7 +8,7 @@ python3 -m src.main \
 		dataset.split_dir="split/mini" \
 		model.arch='resnet18' \
 		evaluate=True \
-		eval_parallel.method="tim_adm" \
+		eval.method="tim_adm" \
 
 # ===========================> WRN 28-10 <=========================================
 
@@ -19,7 +19,7 @@ python3 -m src.main \
 		dataset.split_dir="split/mini" \
 		model.arch='wideres' \
 		evaluate=True \
-		eval_parallel.method="tim_adm" \
+		eval.method="tim_adm" \
 
 # ===========================> DenseNet <=========================================
 
@@ -30,7 +30,7 @@ python3 -m src.main \
 		dataset.split_dir="split/mini" \
 		model.arch='densenet121' \
 		evaluate=True \
-		eval_parallel.method="tim_adm" \
+		eval.method="tim_adm" \
 
 
-# python3 -m src.main with dataset.path="data/mini_imagenet" ckpt_path="checkpoints/mini/softmax/wideres" dataset.split_dir="split/mini" model.arch='wideres' evaluate=True eval_parallel.method="tim_adm"
+# python3 -m src.main with dataset.path="data/mini_imagenet" ckpt_path="checkpoints/mini/softmax/wideres" dataset.split_dir="split/mini" model.arch='wideres' evaluate=True eval.method="tim_adm"

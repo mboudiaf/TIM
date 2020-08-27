@@ -7,7 +7,7 @@ python3 -m src.main \
 		dataset.split_dir="split/mini" \
 		model.arch='resnet18' \
 		evaluate=True \
-		eval_parallel.meta_val_way=10
+		eval.meta_val_way=10
 
 python3 -m src.main \
 		-F logs/20_ways/non_augmented/tim_gd/resnet18 \
@@ -16,4 +16,4 @@ python3 -m src.main \
 		dataset.split_dir="split/mini" \
 		model.arch='resnet18' \
 		evaluate=True \
-		eval_parallel.meta_val_way=20
+		eval.meta_val_way=20

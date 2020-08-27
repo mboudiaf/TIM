@@ -9,5 +9,5 @@ python3 -m src.main \
 		model.num_classes=100 \
 		tim.iter=1000 \
 		evaluate=True \
-		eval_parallel.method='tim_gd' \
+		eval.method='tim_gd' \
 

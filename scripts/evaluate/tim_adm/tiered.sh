@@ -9,7 +9,7 @@ python3 -m src.main \
 		model.arch='resnet18' \
 		model.num_classes=351 \
 		evaluate=True \
-		eval_parallel.method="tim_adm"
+		eval.method="tim_adm"
 
 # ===========================> WRN 28-10 <=========================================
 
@@ -21,7 +21,7 @@ python3 -m src.main \
 		model.num_classes=351 \
 		model.arch='wideres' \
 		evaluate=True \
-		eval_parallel.method="tim_adm"
+		eval.method="tim_adm"
 
 # # ===========================> DenseNet <=========================================
 
@@ -33,4 +33,4 @@ python3 -m src.main \
 		model.num_classes=351 \
 		model.arch='densenet121' \
 		evaluate=True \
-		eval_parallel.method="tim_adm"
+		eval.method="tim_adm"

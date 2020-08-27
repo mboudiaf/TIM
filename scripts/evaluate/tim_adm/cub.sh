@@ -8,5 +8,5 @@ python3 -m src.main \
 		evaluate=True \
 		model.arch='resnet18' \
 		model.num_classes=100 \
-		eval_parallel.method="tim_adm" \
+		eval.method="tim_adm" \
 

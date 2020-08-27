@@ -8,7 +8,7 @@ python3 -m src.main \
         dataset.split_dir="split/mini" \
         model.arch='resnet18' \
         evaluate=True \
-        eval_parallel.method='tim_gd' \
+        eval.method='tim_gd' \
         tim.iter=1000 \
         tim.loss_weights="[0.1, 0., 0.]" \
 
@@ -21,7 +21,7 @@ python3 -m src.main \
         dataset.split_dir="split/mini" \
         model.arch='resnet18' \
         evaluate=True \
-        eval_parallel.method='tim_gd' \
+        eval.method='tim_gd' \
         tim.iter=1000 \
         tim.loss_weights="[0.1, 0., 0.1]" \
 
@@ -34,7 +34,7 @@ python3 -m src.main \
         dataset.split_dir="split/mini" \
         model.arch='resnet18' \
         evaluate=True \
-        eval_parallel.method='tim_gd' \
+        eval.method='tim_gd' \
         tim.iter=1000 \
         tim.loss_weights="[0.1, 1.0, 0.]" \
 
@@ -46,7 +46,7 @@ python3 -m src.main \
         dataset.split_dir="split/mini" \
         model.arch='resnet18' \
         evaluate=True \
-        eval_parallel.method='tim_gd' \
+        eval.method='tim_gd' \
         tim.iter=1000 \
         tim.loss_weights="[0.1, 1.0, 0.1]" \
 
@@ -63,7 +63,7 @@ python3 -m src.main \
         model.arch='resnet18' \
         model.num_classes=351 \
         evaluate=True \
-        eval_parallel.method='tim_gd' \
+        eval.method='tim_gd' \
         tim.iter=1000 \
         tim.loss_weights="[0.1, 0., 0.]" \
 
@@ -77,7 +77,7 @@ python3 -m src.main \
         model.arch='resnet18' \
         model.num_classes=351 \
         evaluate=True \
-        eval_parallel.method='tim_gd' \
+        eval.method='tim_gd' \
         tim.iter=1000 \
         tim.loss_weights="[0.1, 0., 0.1]" \
 
@@ -90,7 +90,7 @@ python3 -m src.main \
         model.num_classes=351 \
         model.arch='resnet18' \
         evaluate=True \
-        eval_parallel.method='tim_gd' \
+        eval.method='tim_gd' \
         tim.iter=1000 \
         tim.loss_weights="[0.1, 1.0, 0.]" \
 
@@ -103,7 +103,7 @@ python3 -m src.main \
         model.num_classes=351 \
         model.arch='resnet18' \
         evaluate=True \
-        eval_parallel.method='tim_gd' \
+        eval.method='tim_gd' \
         tim.iter=1000 \
         tim.loss_weights="[0.1, 1.0, 0.1]" \
 
@@ -120,7 +120,7 @@ python3 -m src.main \
         model.arch='resnet18' \
         model.num_classes=100 \
         evaluate=True \
-        eval_parallel.method='tim_gd' \
+        eval.method='tim_gd' \
         tim.iter=1000 \
         tim.loss_weights="[0.1, 0., 0.]" \
 
@@ -134,7 +134,7 @@ python3 -m src.main \
         model.arch='resnet18' \
         model.num_classes=100 \
         evaluate=True \
-        eval_parallel.method='tim_gd' \
+        eval.method='tim_gd' \
         tim.iter=1000 \
         tim.loss_weights="[0.1, 0., 0.1]" \
 
@@ -147,7 +147,7 @@ python3 -m src.main \
         model.arch='resnet18' \
         model.num_classes=100 \
         evaluate=True \
-        eval_parallel.method='tim_gd' \
+        eval.method='tim_gd' \
         tim.iter=1000 \
         tim.loss_weights="[0.1, 1.0, 0.]" \
 
@@ -160,6 +160,6 @@ python3 -m src.main \
         model.arch='resnet18' \
         model.num_classes=100 \
         evaluate=True \
-        eval_parallel.method='tim_gd' \
+        eval.method='tim_gd' \
         tim.iter=1000 \
         tim.loss_weights="[0.1, 1.0, 0.1]" \

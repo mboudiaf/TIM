@@ -8,5 +8,5 @@ python3 -m src.main \
 		dataset.split_dir="split/mini" \
 		model.arch='resnet18' \
 		evaluate=True \
-		eval_parallel.target_data_path="data/cub/CUB_200_2011/images" \
-		eval_parallel.target_split_dir="split/cub" \
+		eval.target_data_path="data/cub/CUB_200_2011/images" \
+		eval.target_split_dir="split/cub" \
