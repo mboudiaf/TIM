@@ -2,8 +2,7 @@
 
 
 ##  Introduction
-We introduce Transductive Infomation Maximization (TIM) for few-shot learning. Our method maximizes the mutual information between the query features and predictions of a few-shot task, subject
-to supervision constraint from the support set. Results provided in the paper can be reproduced with this repo. Code was developped under python 3.8.3 and pytorch 1.4.0. The code is parallelized over tasks (which makes the execution of the 10'000 tasks very efficient).
+This repo contains the code for our paper "Transductive Infomation Maximization (TIM) for few-shot learning" available at https://arxiv.org/abs/2008.11297. Our method maximizes the mutual information between the query features and predictions of a few-shot task, subject to supervision constraint from the support set. Results provided in the paper can be reproduced with this repo. Code was developped under python 3.8.3 and pytorch 1.4.0. The code is parallelized over tasks (which makes the execution of the 10'000 tasks very efficient).
 
 
 ## 1. Getting started
@@ -37,8 +36,7 @@ If you face an issue with the previous scripts, everything required can be downl
 
 ## 2. Train models (optional)
 
-Instead of using the pre-trained models, you may want to train the models from scratch.
-Before anything, don't forget to activate the downloaded environment:
+Instead of using the pre-trained models, you may want to train the models from scratch. Before anything, don't forget to activate the downloaded environment:
 ```python
 source env/bin/activate
 ```
