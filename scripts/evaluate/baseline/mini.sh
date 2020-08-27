@@ -7,7 +7,7 @@ python3 -m src.main \
 		ckpt_path="checkpoints/mini/softmax/resnet18" \
 		dataset.split_dir="split/mini" \
 		model.arch='resnet18' \
-		evaluate=True 
+		evaluate=True
 
 # ===========================> WRN 28-10 <=========================================
 
@@ -27,4 +27,4 @@ python3 -m src.main \
 		ckpt_path="checkpoints/mini/softmax/densenet121" \
 		dataset.split_dir="split/mini" \
 		model.arch='densenet121' \
-		evaluate=True \
+		evaluate=True

@@ -10,4 +10,3 @@ python3 -m src.main \
 		evaluate=True \
 		eval_parallel.target_data_path="data/cub/CUB_200_2011/images" \
 		eval_parallel.target_split_dir="split/cub" \
-		eval_parallel.norms_types="["L2N", "CL2N"]"

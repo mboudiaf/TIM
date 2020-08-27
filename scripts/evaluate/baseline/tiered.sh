@@ -8,7 +8,6 @@ python3 -m src.main \
 		dataset.split_dir="split/tiered" \
 		model.arch='resnet18' \
 		model.num_classes=351 \
-		eval_parallel.norms_types="["L2N", "CL2N"]" \
 		evaluate=True
 
 # ===========================> WRN 28-10 <=========================================
@@ -20,7 +19,6 @@ python3 -m src.main \
 		dataset.split_dir="split/tiered" \
 		model.arch='wideres' \
 		model.num_classes=351 \
-		eval_parallel.norms_types="["L2N", "CL2N"]" \
 		evaluate=True
 
 # ===========================> DenseNet <=========================================
@@ -33,5 +31,4 @@ python3 -m src.main \
 		dataset.batch_size=16 \
 		model.arch='densenet121' \
 		model.num_classes=351 \
-		eval_parallel.norms_types="["L2N", "CL2N"]" \
 		evaluate=True

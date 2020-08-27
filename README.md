@@ -48,7 +48,7 @@ python -m visdom.server -port 8098
 ```
 and open it in your browser : http://localhost:8098/ . Then, for instance, if you want to train a Resnet-18 on mini-Imagenet, go to the root of the directory, and execute:
 ```python
-bash scripts/train/mini/resnet18.sh
+bash scripts/train/resnet18.sh
 ```
 
 ## 3. Reproducing the main results
@@ -96,13 +96,14 @@ bash scripts/evaluate/<tim_adm or tim_gd>/mini2cub.sh
 If you want to reproduce the methods with more ways (10 and 20 ways) on mini-Imagenet, go to the root of the directory and execute:
 
 ```python
-bash scripts/more_ways/mini.sh
+bash scripts/evaluate/<tim_adm or tim_gd>/mini_10_20_ways.sh
 ```
 
 |(1 shot/5 shot)|    Arch     |       10 ways     |       20 ways        |
 | 	   ---      |     ---     |        ---        |	       ---           |
 | TIM-ADM       |   Resnet18  |   56.0 / **72.9** |  **39.5** / 58.8     |
 | TIM-GD        |   Resnet18  |**56.1** / 72.8    |    39.3 / **59.5** |
+
 
 ### 3.4 Ablation study (Table 4. in paper)
 
