@@ -112,7 +112,6 @@ class TIM_GD(TIM):
             ce = - (y_s_one_hot * torch.log(logits_s.softmax(2) + 1e-12)).sum(2).mean(1).sum(0)  # Taking the mean over samples within a task, and summing over all samples
             q_probs = logits_q.softmax(2)
             q_cond_ent = - (q_probs * torch.log(q_probs + 1e-12)).sum(2).mean(1).sum(0)
-            # q_ent = - self.get_div(q_probs.mean(1), prior.unsqueeze(0))
             q_ent = - (q_probs.mean(1) * torch.log(q_probs.mean(1))).sum(1).sum(0)
             loss = self.loss_weights[0] * ce - (self.loss_weights[1] * q_ent - self.loss_weights[2] * q_cond_ent)
             self.optimizer.zero_grad()

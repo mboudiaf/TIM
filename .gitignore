@@ -7,4 +7,5 @@ tmp/
 env/
 tim_github.sublime-project
 tim_github.sublime-workspace
+.gitignore
 __pycache__/
