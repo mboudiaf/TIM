@@ -11,8 +11,6 @@ from sacred import SETTINGS
 from sacred.utils import apply_backspaces_and_linefeeds
 from src.utils import warp_tqdm, save_checkpoint
 from src.trainer import Trainer, trainer_ingredient
-from src.eval_parallel import Evaluator as Evaluator_parallelized
-from src.eval_parallel import eval_parallel_ingredient
 from src.eval import Evaluator
 from src.eval import eval_ingredient
 from src.tim import tim_ingredient
@@ -21,8 +19,8 @@ from src.datasets.ingredient import dataset_ingredient
 from src.models.ingredient import get_model, model_ingredient
 
 ex = sacred.Experiment('FSL training',
-                       ingredients=[trainer_ingredient, eval_parallel_ingredient,
-                                    eval_ingredient, optim_ingredient, dataset_ingredient,
+                       ingredients=[trainer_ingredient, eval_ingredient,
+                                    optim_ingredient, dataset_ingredient,
                                     model_ingredient, tim_ingredient])
 # Filter backspaces and linefeeds
 SETTINGS.CAPTURE_MODE = 'sys'
@@ -96,25 +94,12 @@ def main(seed, pretrain, resume, evaluate, print_runtime,
     cudnn.benchmark = True
 
     # Data loading code
+    evaluator = Evaluator(device=device, ex=ex)
     if evaluate:
-        if ex.current_run.config['tim']['finetune_encoder'] or make_plot or print_runtime:
-            evaluator = Evaluator(device=device, ex=ex)
-        else:
-            evaluator = Evaluator_parallelized(device=device, ex=ex)
         results = evaluator.run_full_evaluation(model=model,
                                                 model_path=ckpt_path,
                                                 callback=callback)
         return results
-
-    if print_runtime:
-        evaluator = Evaluator(device=device, ex=ex)
-        evaluator.print_runtimes(model_path=ckpt_path)
-        return
-
-    if make_plot:
-        evaluator = Evaluator(device=device, ex=ex)
-        evaluator.make_plots(model_path=ckpt_path)
-        return
 
     # If this line is reached, then training the model
     trainer = Trainer(device=device, ex=ex)

@@ -15,7 +15,7 @@ Use the provided script:
 ```python
 python -m scripts.downloads.download_data
 ```
-For Tiered-Imagenet, please download the zip file at https://drive.google.com/drive/folders/163HGKZTvfcxsY96uIF6ILK_6ZmlULf_j?usp=sharing, and unzip it into the data/ folder.
+For **Tiered-Imagenet**, please download the zip file at https://drive.google.com/drive/folders/163HGKZTvfcxsY96uIF6ILK_6ZmlULf_j?usp=sharing, and unzip it into the data/ folder.
 
 #### 1.1.2 Download models
 
