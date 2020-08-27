@@ -1,4 +1,3 @@
-from collections import OrderedDict
 import torch
 import numpy as np
 import shutil
@@ -7,7 +6,6 @@ import logging
 import os
 import pickle
 import torch.nn.functional as F
-import torch.nn as nn
 
 
 def get_one_hot(y_s):
@@ -160,4 +158,3 @@ def compute_confidence_interval(data, axis=0):
     std = np.std(a, axis=axis)
     pm = 1.96 * (std / np.sqrt(a.shape[axis]))
     return m, pm
-

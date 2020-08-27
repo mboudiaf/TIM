@@ -95,9 +95,8 @@ class TIM(object):
 
 class TIM_GD(TIM):
     @tim_ingredient.capture
-    def __init__(self, lr, div, model):
+    def __init__(self, lr, model):
         super().__init__(model=model)
-        self.div = div
         self.lr = lr
 
     def run_adaptation(self, support, query, y_s, y_q, callback):
