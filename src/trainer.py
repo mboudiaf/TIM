@@ -1,7 +1,6 @@
 import torch
 import time
 import torch.nn as nn
-import torch.nn.functional as F
 import numpy as np
 from sacred import Ingredient
 from src.utils import warp_tqdm, get_metric, AverageMeter
@@ -15,29 +14,20 @@ def config():
     meta_val_shot = 1
     meta_val_metric = 'cosine'  # ('euclidean', 'cosine', 'l1', l2')
     meta_val_iter = 500
-    disable_train_augment = False
     meta_val_query = 15
-    val_data_path = None  # Only for cross-domain scenario
-    val_split_dir = None  # Only for cross-domain scenario
-    meta_val_interval = 1
     alpha = - 1.0
     label_smoothing = 0.
 
 
 class Trainer:
     @trainer_ingredient.capture
-    def __init__(self, device, disable_train_augment, meta_val_iter, meta_val_way, meta_val_shot,
-                 meta_val_query, val_data_path, val_split_dir, meta_val_interval, ex):
+    def __init__(self, device, meta_val_iter, meta_val_way, meta_val_shot,
+                 meta_val_query, ex):
 
-        self.train_loader = get_dataloader(split='train', aug=not disable_train_augment, shuffle=True)
+        self.train_loader = get_dataloader(split='train', aug=True, shuffle=True)
         sample_info = [meta_val_iter, meta_val_way, meta_val_shot, meta_val_query]
-        if val_data_path is not None:
-            self.val_loader = get_dataloader('val', aug=False, path=val_data_path,
-                                             split_dir=val_split_dir, sample=sample_info)
-        else:
-            self.val_loader = get_dataloader(split='val', aug=False, sample=sample_info)
+        self.val_loader = get_dataloader(split='val', aug=False, sample=sample_info)
         self.device = device
-        self.meta_val_interval = meta_val_interval
         self.num_classes = ex.current_run.config['model']['num_classes']
 
     def cross_entropy(self, logits, one_hot_targets, reduction='batchmean'):
@@ -46,8 +36,8 @@ class Trainer:
         return - (one_hot_targets * logsoftmax).sum(1).mean()
 
     @trainer_ingredient.capture
-    def train(self, epoch, scheduler, print_freq, disable_tqdm, callback,
-              model, alpha, optimizer):
+    def do_epoch(self, epoch, scheduler, print_freq, disable_tqdm, callback, model,
+                 alpha, optimizer):
         batch_time = AverageMeter()
         losses = AverageMeter()
         top1 = AverageMeter()
@@ -102,11 +92,11 @@ class Trainer:
                 if callback is not None:
                     callback.scalar('train_loss', i / steps_per_epoch + epoch, losses.avg, title='Train loss')
                     callback.scalar('@1', i / steps_per_epoch + epoch, top1.avg, title='Train Accuracy')
-
-        # Track learning rate
+        scheduler.step()
         for param_group in optimizer.param_groups:
             current_lr = param_group['lr']
-        callback.scalar('lr', epoch, current_lr, title='Learning rate')
+        if callback is not None:
+            callback.scalar('lr', epoch, current_lr, title='Learning rate')
 
     @trainer_ingredient.capture
     def smooth_one_hot(self, targets, label_smoothing):
@@ -118,8 +108,7 @@ class Trainer:
         return new_targets
 
     @trainer_ingredient.capture
-    def meta_val(self, model, meta_val_way, meta_val_shot,
-                 disable_tqdm, callback, epoch, train_mean=None):
+    def meta_val(self, model, meta_val_way, meta_val_shot, disable_tqdm, callback, epoch):
         top1 = AverageMeter()
         model.eval()
 
@@ -128,8 +117,6 @@ class Trainer:
             for i, (inputs, target, _) in enumerate(tqdm_test_loader):
                 inputs, target = inputs.to(self.device), target.to(self.device, non_blocking=True)
                 output = model(inputs, feature=True)[0].cuda(0)
-                if train_mean is not None:
-                    output = output - train_mean
                 train_out = output[:meta_val_way * meta_val_shot]
                 train_label = target[:meta_val_way * meta_val_shot]
                 test_out = output[meta_val_way * meta_val_shot:]
@@ -147,10 +134,10 @@ class Trainer:
         return top1.avg
 
     @trainer_ingredient.capture
-    def metric_prediction(self, gallery, query, train_label, meta_val_metric):
-        gallery = gallery.view(gallery.shape[0], -1)
+    def metric_prediction(self, support, query, train_label, meta_val_metric):
+        support = support.view(support.shape[0], -1)
         query = query.view(query.shape[0], -1)
-        distance = get_metric(meta_val_metric)(gallery, query)
+        distance = get_metric(meta_val_metric)(support, query)
         predict = torch.argmin(distance, dim=1)
         predict = torch.take(train_label, predict)
         return predict

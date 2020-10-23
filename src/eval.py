@@ -12,16 +12,16 @@ from src.tim import TIM, TIM_ADM, TIM_GD
 eval_ingredient = Ingredient('eval')
 @eval_ingredient.config
 def config():
-    meta_test_iter = 10000
-    meta_val_way = 5
-    meta_val_query = 15
+    number_tasks = 10000
+    n_ways = 5
+    query_shots = 15
     method = 'baseline'
     model_tag = 'best'
     target_data_path = None  # Only for cross-domain scenario
     target_split_dir = None  # Only for cross-domain scenario
     plt_metrics = ['accs']
     shots = [1, 5]
-    used_set = 'test'
+    used_set = 'test'  # can also be val for hyperparameter tuning
 
 
 class Evaluator:
@@ -30,27 +30,21 @@ class Evaluator:
         self.device = device
         self.ex = ex
 
-    def merge_tasks(self, tasks_dics):
-        merged_tasks = {}
-        n_tasks = len(tasks_dics)
-        for key in tasks_dics[0].keys():
-            batch_size = tasks_dics[0][key].size(0)
-            merged_tasks[key] = torch.cat([tasks_dics[i][key] for i in range(n_tasks)], dim=0).view(n_tasks, batch_size, -1)
-        return merged_tasks
-
-    @eval_ingredient.capture
-    def generate_tasks(self, loaders_dic, extracted_features_dic, model_path, shot, model_tag, used_set, meta_test_iter):
-
-        print(f" ==> Generating {meta_test_iter} tasks ...")
-        tasks_dics = []
-        for _ in warp_tqdm(range(meta_test_iter), False):
-            task_dic = self.get_task(shot=shot, extracted_features_dic=extracted_features_dic)
-            tasks_dics.append(task_dic)
-        tasks = self.merge_tasks(tasks_dics)
-        return tasks
-
     @eval_ingredient.capture
     def run_full_evaluation(self, model, model_path, model_tag, shots, method, callback):
+        """
+        Run the evaluation over all the tasks in parallel
+        inputs:
+            model : The loaded model containing the feature extractor
+            loaders_dic : Dictionnary containing training and testing loaders
+            model_path : Where was the model loaded from
+            model_tag : Which model ('final' or 'best') to load
+            method : Which method to use for inference ("baseline", "tim-gd" or "tim-adm")
+            shots : Number of support shots to try
+
+        returns :
+            results : List of the mean accuracy for each number of support shots
+        """
         print("=> Runnning full evaluation with method: {}".format(method))
 
         # Load pre-trained model
@@ -64,14 +58,12 @@ class Evaluator:
                                                        model_path=model_path,
                                                        loaders_dic=loaders_dic)
         results = []
-        train_mean = extracted_features_dic['train_mean']
         for shot in shots:
 
-            tasks = self.generate_tasks(loaders_dic=loaders_dic, extracted_features_dic=extracted_features_dic,
-                                        shot=shot, model_path=model_path)
+            tasks = self.generate_tasks(extracted_features_dic=extracted_features_dic,
+                                        shot=shot)
             logs = self.run_task(task_dic=tasks,
                                  model=model,
-                                 train_mean=train_mean,
                                  callback=callback)
 
             l2n_mean, l2n_conf = compute_confidence_interval(logs['acc'][:, -1])
@@ -81,7 +73,7 @@ class Evaluator:
             results.append(l2n_mean)
         return results
 
-    def run_task(self, task_dic, train_mean, model, callback):
+    def run_task(self, task_dic, model, callback):
 
         # Build the TIM classifier builder
         tim_builder = self.get_tim_builder(model=model)
@@ -95,7 +87,6 @@ class Evaluator:
         query = z_q.to(self.device)  # [ N * (K_s + K_q), d]
         y_s = y_s.long().squeeze(2).to(self.device)
         y_q = y_q.long().squeeze(2).to(self.device)
-        train_mean = train_mean.to(self.device)
 
         # Perform normalizations required
         support = F.normalize(support, dim=2)
@@ -127,35 +118,36 @@ class Evaluator:
         return tim_builder
 
     @eval_ingredient.capture
-    def get_loaders(self, used_set, target_data_path, target_split_dir, meta_test_iter, meta_val_way,
-                    meta_val_query, shots):
+    def get_loaders(self, used_set, target_data_path, target_split_dir):
         # First, get loaders
-        episodic_test_loaders = {}
         loaders_dic = {}
-        loader_info = {'aug': False, 'shuffle': False,
-                       'out_name': False}
+        loader_info = {'aug': False, 'shuffle': False, 'out_name': False}
+
         if target_data_path is not None:  # This mean we are in the cross-domain scenario
             loader_info.update({'path': target_data_path,
                                 'split_dir': target_split_dir})
+
         train_loader = get_dataloader('train', **loader_info)
         loaders_dic['train_loader'] = train_loader
-        try:  # In case there are predefined support-query files (for iNat only)
-            support_loader = get_dataloader('support', **loader_info)
-            query_loader = get_dataloader('query', **loader_info)
-            loaders_dic.update({'query': query_loader, 'support': support_loader})
-        except:  # For all other datasets
-            test_loader = get_dataloader(used_set, **loader_info)
-            loaders_dic.update({'test': test_loader})
 
-        for shot in shots:
-            sample_info = [meta_test_iter, meta_val_way, shot, meta_val_query]
-            loader_info.update({'sample': sample_info})
-            episodic_test_loaders[shot] = get_dataloader(used_set, **loader_info)
-        loaders_dic.update({'episodic_test': episodic_test_loaders})
+        test_loader = get_dataloader(used_set, **loader_info)
+        loaders_dic.update({'test': test_loader})
         return loaders_dic
 
     @eval_ingredient.capture
     def extract_features(self, model, model_path, model_tag, used_set, loaders_dic):
+        """
+        inputs:
+            model : The loaded model containing the feature extractor
+            loaders_dic : Dictionnary containing training and testing loaders
+            model_path : Where was the model loaded from
+            model_tag : Which model ('final' or 'best') to load
+            used_set : Set used between 'test' and 'val'
+            n_ways : Number of ways for the task
+
+        returns :
+            extracted_features_dic : Dictionnary containing all extracted features and labels
+        """
 
         # Load features from memory if previously saved ...
         save_dir = os.path.join(model_path, model_tag, used_set)
@@ -173,73 +165,51 @@ class Evaluator:
 
         model.eval()
         with torch.no_grad():
-            out_mean = []
-            for i, (inputs, _, _) in enumerate(warp_tqdm(loaders_dic['train_loader'], False)):
+
+            all_features = []
+            all_labels = []
+            for i, (inputs, labels, _) in enumerate(warp_tqdm(loaders_dic['test'], False)):
                 inputs = inputs.to(self.device)
                 outputs, _ = model(inputs, True)
-                out_mean.append(outputs.cpu().view(outputs.size(0), -1))
-            out_mean = torch.cat(out_mean, axis=0).mean(0)
-
-            if 'test' in loaders_dic:
-                test_dict = collections.defaultdict(list)
-                all_features = []
-                all_labels = []
-                for i, (inputs, labels, _) in enumerate(warp_tqdm(loaders_dic['test'], False)):
-                    inputs = inputs.to(self.device)
-                    outputs, _ = model(inputs, True)
-                    all_features.append(outputs.cpu())
-                    all_labels.append(labels)
-                all_features = torch.cat(all_features, 0)
-                all_labels = torch.cat(all_labels, 0)
-                extracted_features_dic = {'train_mean': out_mean,
-                                          'test': test_dict,
-                                          'concat_features': all_features,
-                                          'concat_labels': all_labels
-                                          }
-            else:
-                support_dict = collections.defaultdict(list)
-                for i, (inputs, labels, _) in enumerate(warp_tqdm(loaders_dic['support'], False)):
-                    inputs, labels = inputs.to(self.device), labels.to(self.device)
-                    outputs, _ = model(inputs, True)
-                    outputs = outputs.cpu()
-                    for out, label in zip(outputs, labels):
-                        support_dict[label.item()].append(out.view(1, -1))
-
-                query_dict = collections.defaultdict(list)
-                for i, (inputs, labels, _) in enumerate(warp_tqdm(loaders_dic['query'], False)):
-                    inputs, labels = inputs.to(self.device), labels.to(self.device)
-                    outputs, _ = model(inputs, True)
-                    outputs = outputs.cpu()
-                    for out, label in zip(outputs, labels):
-                        query_dict[label.item()].append(out.view(1, -1))
-
-                for label in support_dict:
-                    support_dict[label] = torch.cat(support_dict[label], dim=0)
-                    query_dict[label] = torch.cat(query_dict[label], dim=0)
-                extracted_features_dic = {'train_mean': out_mean,
-                                          'support': support_dict,
-                                          'query': query_dict
-                                          }
+                all_features.append(outputs.cpu())
+                all_labels.append(labels)
+            all_features = torch.cat(all_features, 0)
+            all_labels = torch.cat(all_labels, 0)
+            extracted_features_dic = {'concat_features': all_features,
+                                      'concat_labels': all_labels
+                                      }
         print(" ==> Saving features to {}".format(filepath))
         save_pickle(filepath, extracted_features_dic)
         return extracted_features_dic
 
     @eval_ingredient.capture
-    def get_task(self, shot, meta_val_way, meta_val_query, extracted_features_dic):
+    def get_task(self, shot, n_ways, query_shots, extracted_features_dic):
+        """
+        inputs:
+            extracted_features_dic : Dictionnary containing all extracted features and labels
+            shot : Number of support shot per class
+            n_ways : Number of ways for the task
+
+        returns :
+            task : Dictionnary : z_support : torch.tensor of shape [n_ways * shot, feature_dim]
+                                 z_query : torch.tensor of shape [n_ways * query_shot, feature_dim]
+                                 y_support : torch.tensor of shape [n_ways * shot]
+                                 y_query : torch.tensor of shape [n_ways * query_shot]
+        """
         all_features = extracted_features_dic['concat_features']
         all_labels = extracted_features_dic['concat_labels']
         all_classes = torch.unique(all_labels)
-        samples_classes = np.random.choice(a=all_classes, size=meta_val_way, replace=False)
+        samples_classes = np.random.choice(a=all_classes, size=n_ways, replace=False)
         support_samples = []
         query_samples = []
         for each_class in samples_classes:
             class_indexes = torch.where(all_labels == each_class)[0]
-            indexes = np.random.choice(a=class_indexes, size=shot + meta_val_query, replace=False)
+            indexes = np.random.choice(a=class_indexes, size=shot + query_shots, replace=False)
             support_samples.append(all_features[indexes[:shot]])
             query_samples.append(all_features[indexes[shot:]])
 
-        y_support = torch.arange(meta_val_way)[:, None].repeat(1, shot).reshape(-1)
-        y_query = torch.arange(meta_val_way)[:, None].repeat(1, meta_val_query).reshape(-1)
+        y_support = torch.arange(n_ways)[:, None].repeat(1, shot).reshape(-1)
+        y_query = torch.arange(n_ways)[:, None].repeat(1, query_shots).reshape(-1)
 
         z_support = torch.cat(support_samples, 0)
         z_query = torch.cat(query_samples, 0)
@@ -248,3 +218,30 @@ class Evaluator:
                 'z_q': z_query, 'y_q': y_query}
         return task
 
+    @eval_ingredient.capture
+    def generate_tasks(self, extracted_features_dic, shot, number_tasks):
+        """
+        inputs:
+            extracted_features_dic :
+            shot : Number of support shot per class
+            number_tasks : Number of tasks to generate
+
+        returns :
+            merged_task : { z_support : torch.tensor of shape [number_tasks, n_ways * shot, feature_dim]
+                            z_query : torch.tensor of shape [number_tasks, n_ways * query_shot, feature_dim]
+                            y_support : torch.tensor of shape [number_tasks, n_ways * shot]
+                            y_query : torch.tensor of shape [number_tasks, n_ways * query_shot] }
+        """
+        print(f" ==> Generating {number_tasks} tasks ...")
+        tasks_dics = []
+        for _ in warp_tqdm(range(number_tasks), False):
+            task_dic = self.get_task(shot=shot, extracted_features_dic=extracted_features_dic)
+            tasks_dics.append(task_dic)
+
+        # Now merging all tasks into 1 single dictionnary
+        merged_tasks = {}
+        n_tasks = len(tasks_dics)
+        for key in tasks_dics[0].keys():
+            n_samples = tasks_dics[0][key].size(0)
+            merged_tasks[key] = torch.cat([tasks_dics[i][key] for i in range(n_tasks)], dim=0).view(n_tasks, n_samples, -1)
+        return merged_tasks

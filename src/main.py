@@ -3,7 +3,6 @@ import random
 import sacred
 import torch
 import torch.backends.cudnn as cudnn
-import torch.nn as nn
 import torch.utils.data
 import torch.utils.data.distributed
 from visdom_logger import VisdomLogger
@@ -104,15 +103,15 @@ def main(seed, pretrain, resume, evaluate, print_runtime,
     # If this line is reached, then training the model
     trainer = Trainer(device=device, ex=ex)
     scheduler = get_scheduler(optimizer=optimizer,
-                              batches=len(trainer.train_loader),
+                              num_batches=len(trainer.train_loader),
                               epochs=epochs)
     tqdm_loop = warp_tqdm(list(range(start_epoch, epochs)),
                           disable_tqdm=disable_tqdm)
     for epoch in tqdm_loop:
         # Do one epoch
-        trainer.train(model=model, optimizer=optimizer, epoch=epoch,
-                      scheduler=scheduler, disable_tqdm=disable_tqdm,
-                      callback=callback)
+        trainer.do_epoch(model=model, optimizer=optimizer, epoch=epoch,
+                         scheduler=scheduler, disable_tqdm=disable_tqdm,
+                         callback=callback)
 
         # Evaluation on validation set
         if (epoch) % trainer.meta_val_interval == 0:
