@@ -15,13 +15,13 @@ python3 -m src.main \
 # ===============> Tiered <===================
 
 python3 -m src.main \
-		with dataset.path="data/tiered_imagenet" \
+		with dataset.path="data/tiered_imagenet/data" \
 		dataset.split_dir="split/tiered" \
 		dataset.jitter=True \
 		ckpt_path="checkpoints/tiered/softmax/wideres" \
 		dataset.batch_size=256 \
 		model.arch='wideres' \
-		model.num_classes=64 \
+		model.num_classes=351 \
 		optim.scheduler="multi_step" \
 		epochs=90 \
 		trainer.label_smoothing=0.1

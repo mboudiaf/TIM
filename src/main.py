@@ -114,14 +114,13 @@ def main(seed, pretrain, resume, evaluate, print_runtime,
                          callback=callback)
 
         # Evaluation on validation set
-        if (epoch) % trainer.meta_val_interval == 0:
-            prec1 = trainer.meta_val(model=model, disable_tqdm=disable_tqdm,
-                                     epoch=epoch, callback=callback)
-            print('Meta Val {}: {}'.format(epoch, prec1))
-            is_best = prec1 > best_prec1
-            best_prec1 = max(prec1, best_prec1)
-            if not disable_tqdm:
-                tqdm_loop.set_description('Best Acc {:.2f}'.format(best_prec1 * 100.))
+        prec1 = trainer.meta_val(model=model, disable_tqdm=disable_tqdm,
+                                 epoch=epoch, callback=callback)
+        print('Meta Val {}: {}'.format(epoch, prec1))
+        is_best = prec1 > best_prec1
+        best_prec1 = max(prec1, best_prec1)
+        if not disable_tqdm:
+            tqdm_loop.set_description('Best Acc {:.2f}'.format(best_prec1 * 100.))
 
         # Save checkpoint
         save_checkpoint(state={'epoch': epoch + 1,
