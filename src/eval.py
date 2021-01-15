@@ -22,6 +22,7 @@ def config():
     plt_metrics = ['accs']
     shots = [1, 5]
     used_set = 'test'  # can also be val for hyperparameter tuning
+    fresh_start = False
 
 
 class Evaluator:
@@ -135,7 +136,7 @@ class Evaluator:
         return loaders_dic
 
     @eval_ingredient.capture
-    def extract_features(self, model, model_path, model_tag, used_set, loaders_dic):
+    def extract_features(self, model, model_path, model_tag, used_set, fresh_start, loaders_dic):
         """
         inputs:
             model : The loaded model containing the feature extractor
@@ -152,7 +153,7 @@ class Evaluator:
         # Load features from memory if previously saved ...
         save_dir = os.path.join(model_path, model_tag, used_set)
         filepath = os.path.join(save_dir, 'output.plk')
-        if os.path.isfile(filepath):
+        if os.path.isfile(filepath) and (not fresh_start):
             extracted_features_dic = load_pickle(filepath)
             print(" ==> Features loaded from {}".format(filepath))
             return extracted_features_dic
@@ -160,8 +161,7 @@ class Evaluator:
         # ... otherwise just extract them
         else:
             print(" ==> Beginning feature extraction")
-            if not os.path.isdir(save_dir):
-                os.makedirs(save_dir)
+            os.makedirs(save_dir, exist_ok=True)
 
         model.eval()
         with torch.no_grad():
