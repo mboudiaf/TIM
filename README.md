@@ -49,6 +49,8 @@ and open it in your browser : http://localhost:8097/ . Then, for instance, if yo
 bash scripts/train/resnet18.sh
 ```
 
+**Important :** Whenever you have trained yourself a new model and want to test it, please specify the option `eval.fresh_start=True` to your test command. Otherwise, the code may use cached information (used to speed-up experiments) from previously used models that are longer valid.
+
 ## 3. Reproducing the main results
 
 Before anything, don't forget to activate the downloaded environement:
