@@ -22,7 +22,7 @@ def config():
     plt_metrics = ['accs']
     shots = [1, 5]
     used_set = 'test'  # can also be val for hyperparameter tuning
-    fresh_start = False
+    fresh_start = True
 
 
 class Evaluator:

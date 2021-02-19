@@ -92,7 +92,6 @@ class Trainer:
                 if callback is not None:
                     callback.scalar('train_loss', i / steps_per_epoch + epoch, losses.avg, title='Train loss')
                     callback.scalar('@1', i / steps_per_epoch + epoch, top1.avg, title='Train Accuracy')
-        scheduler.step()
         for param_group in optimizer.param_groups:
             current_lr = param_group['lr']
         if callback is not None:

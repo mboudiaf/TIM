@@ -1,4 +1,3 @@
-import torch.nn.functional as F
 from .utils import get_mi, get_cond_entropy, get_entropy, get_one_hot
 from tqdm import tqdm
 from sacred import Ingredient

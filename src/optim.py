@@ -24,6 +24,7 @@ def get_scheduler(epochs, num_batches, optimizer, gamma, lr_stepsize, scheduler)
                                            gamma=gamma),
                  'cosine': CosineAnnealingLR(optimizer, num_batches * epochs, eta_min=1e-9),
                  None: None}
+    print(epochs)
     return SCHEDULER[scheduler]
 
 

@@ -24,7 +24,7 @@ python3 -m src.main \
 		eval.method='tim_gd' \
 
 
-# ===========================> DenseNet <=====================================
+# # ===========================> DenseNet <=====================================
 
 python3 -m src.main \
 		-F logs/tim_gd/mini/densenet121 \
