@@ -4,7 +4,7 @@
 python3 -m src.main \
 		-F logs/non_augmented/baseline/mini2cub/resnet18 \
 		with dataset.path="data/mini_imagenet" \
-		ckpt_path="checkpoints/mini2cub/softmax/resnet18" \
+		ckpt_path="checkpoints/mini/softmax/resnet18" \
 		dataset.split_dir="split/mini" \
 		model.arch='resnet18' \
 		evaluate=True \
