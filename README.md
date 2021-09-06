@@ -32,7 +32,10 @@ python -m scripts.downloads.download_environment
 
 ### 1.2 Manual installation
 
-If you face an issue with the previous scripts, everything required can be downloaded manually at https://drive.google.com/open?id=1KicPkBFOQQJptWmSh3NcE4tHl2ZKD87B Each dataset.zip must be extracted inside the data/ folder. The checkpoints.zip files must be extracted at the root of the directory, same for env.zip file.
+If you face an issue with the previous scripts, everything required can be downloaded manually at https://drive.google.com/open?id=1KicPkBFOQQJptWmSh3NcE4tHl2ZKD87B Each dataset.zip must be extracted inside the data/ folder. The checkpoints.zip files must be extracted at the root of the directory, same for env.zip file. All required libraries should be easily found online, except for visdom_logger that you can download using:
+```
+pip install git+https://github.com/luizgh/visdom_logger
+```
 
 ## 2. Train models (optional)
 
