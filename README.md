@@ -8,31 +8,48 @@ This repo contains the code for our NeurIPS 2020 paper "Transductive Infomation 
 ## 1. Getting started
 
 
-### 1.1 Quick installation (recommended)
+Please find the data and pretrained models at [icloud drive](https://www.icloud.com/iclouddrive/0f3PFO3rJK0fk0nkCe8sDKAiQ#TIM). Please use `cat` command to reform the original file, and extract 
 
-#### 1.1.1 Download datasets
-Use the provided script:
-```python
-python -m scripts.downloads.download_data
+**Checkpoints:** The checkpoints/ directory should be placed in the root dir, and be structured as follows:
+
 ```
-For **Tiered-Imagenet**, please download the zip file at https://drive.google.com/drive/folders/163HGKZTvfcxsY96uIF6ILK_6ZmlULf_j?usp=sharing, and unzip it into the data/ folder.
-
-#### 1.1.2 Download models
-
-We also put the cross-entropy trained models at your disposal. To download the models
-```python
-python -m scripts.downloads.download_models
-```
-#### 1.1.3 Download the environment
-
-For higher reproducibility, we provide the environment that was used to obtain our results. To download it, execute:
-```python
-python -m scripts.downloads.download_environment
+├── mini
+│   └── softmax
+│       ├── densenet121
+│       │   ├── best
+│       │   ├── checkpoint.pth.tar
+│       │   └── model_best.pth.tar
 ```
 
-### 1.2 Manual installation
+**Data:** The checkpoints should be placed in the root directory, and have a structure like. Because of the size, tiered_imagenet has been sharded into 24 shard, 1GB each. Use `cat tiered_imagenet_*` to reform the original file. Extract everything to data/. The data folder should should be structured as follows:
 
-If you face an issue with the previous scripts, everything required can be downloaded manually at https://drive.google.com/open?id=1KicPkBFOQQJptWmSh3NcE4tHl2ZKD87B Each dataset.zip must be extracted inside the data/ folder. The checkpoints.zip files must be extracted at the root of the directory, same for env.zip file. All required libraries should be easily found online, except for visdom_logger that you can download using:
+```
+├── cub
+  ├── attributes.txt
+  └── CUB_200_2011
+      ├── attributes
+      ├── bounding_boxes.txt
+      ├── classes.txt
+      ├── image_class_labels.txt
+      ├── images
+      ├── images.txt
+      ├── parts
+      ├── README
+      └── train_test_split.txt
+├── mini_imagenet
+└── tiered_imagenet
+  ├── class_names.txt
+  ├── data
+  ├── synsets.txt
+  ├── test_images_png.pkl
+  ├── test_labels.pkl
+  ├── train_images_png.pkl
+  ├── train_labels.pkl
+  ├── val_images_png.pkl
+  └── val_labels.pkl
+```
+
+All required libraries should be easily found online, except for visdom_logger that you can download using:
 ```
 pip install git+https://github.com/luizgh/visdom_logger
 ```
